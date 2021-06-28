@@ -1,19 +1,13 @@
-name: 'JavaScript Action Template'
+name: Setup Flyway
 
-description: 'Add description here'
+description: Downloads and installs flyway at the specified version
 
 inputs:
-  input-1:
-    description: 'Add a description here'
+  version:
+    description: The version of flyway to install
     required: true
-  input-2:
-    description: 'Add a description here'
-    required: false
-
-outputs:
-  output-1:
-    description: 'Add a description here'
-
+  architecture:
+    description: 'Target operating system architecture for Flyway to use. Examples: x86, x64. Will use system architecture by default.'
 runs:
   using: 'node12'
   main: 'dist/index.js'
