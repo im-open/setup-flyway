@@ -1,10 +1,10 @@
-name: Build
-on: 
+name: Test
+on:
   pull_request:
     paths-ignore:
       - '**.md'
 jobs:
-  test-flyway-version-5.1.4:
+  test-flyway-version-514:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       fail-fast: false
@@ -25,5 +25,29 @@ jobs:
         run: |
           $FlywayVersion = flyway -v
           if(-Not ($FlywayVersion -Match "5.1.4")) {
+            exit code 1
+          }
+          
+  test-flyway-version-700:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Flyway
+        uses: ./
+        with:
+          version: 7.0.0
+      - name: Check Version
+        id: flyway-version
+        shell: pwsh
+        run: |
+          $FlywayVersion = flyway -v
+          if(-Not ($FlywayVersion -Match "7.0.0")) {
             exit code 1
           }

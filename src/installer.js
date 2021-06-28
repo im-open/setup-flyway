@@ -17,7 +17,7 @@ export async function getFlyway(versionSpec, osArch = os.arch()) {
   } else {
     core.info(`Attempting to download ${versionSpec}...`);
     let downloadPath = '';
-    let info = (await getInfoFromDist(versionSpec, arch)) || {};
+    let info = (await getInfoFromDist(versionSpec, osArch)) || {};
 
     //
     // Download from Flyway
@@ -62,6 +62,13 @@ export async function getFlyway(versionSpec, osArch = os.arch()) {
   }
 
   //
+  // The contents of the windows zip files are wrapped in a folder, unlike the tar.gz files
+  //
+  if (osPlat === 'win32') {
+    toolPath = path.join(toolPath, `flyway-${versionSpec}`);
+  }
+
+  //
   // Add the appropriate paths to the PATH env var
   //
   const driversPath = path.join(toolPath, 'drivers');
@@ -71,17 +78,18 @@ export async function getFlyway(versionSpec, osArch = os.arch()) {
 
 async function getInfoFromDist(version, osArch = os.arch()) {
   let osPlat = os.platform();
-  let fileName =
-    osPlat == 'win32'
-      ? `flyway-commandline-${version}-windows-${osArch}`
-      : `flyway-commandline-${version}-${osPlat}-${osArch}`;
+  core.info(`Current Operating System Platform: ${osPlat}`);
+  let fileName = osPlat === 'win32' ? `flyway-commandline-${version}-windows-${osArch}` : '';
+  fileName =
+    fileName || (osPlat === 'linux' ? `flyway-commandline-${version}-linux-${osArch}` : '');
+  fileName = fileName || `flyway-commandline-${version}-macosx-${osArch}`; // If not windows or linux, then mac
   let urlFileName = osPlat == 'win32' ? `${fileName}.zip` : `${fileName}.tar.gz`;
   let url = `https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${version}/${urlFileName}`;
 
   return {
     downloadUrl: url,
     resolvedVersion: version,
-    arch: arch,
+    arch: osArch,
     fileName: fileName
   };
 }

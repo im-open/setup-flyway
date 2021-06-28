@@ -4292,63 +4292,63 @@ var require_tool_cache = __commonJS({
         yield exec_1.exec(`"${unzipPath}"`, args, { cwd: dest });
       });
     }
-    function cacheDir(sourceDir, tool, version, arch2) {
+    function cacheDir(sourceDir, tool, version, arch) {
       return __awaiter(this, void 0, void 0, function* () {
         version = semver.clean(version) || version;
-        arch2 = arch2 || os3.arch();
-        core3.debug(`Caching tool ${tool} ${version} ${arch2}`);
+        arch = arch || os3.arch();
+        core3.debug(`Caching tool ${tool} ${version} ${arch}`);
         core3.debug(`source dir: ${sourceDir}`);
         if (!fs2.statSync(sourceDir).isDirectory()) {
           throw new Error('sourceDir is not a directory');
         }
-        const destPath = yield _createToolPath(tool, version, arch2);
+        const destPath = yield _createToolPath(tool, version, arch);
         for (const itemName of fs2.readdirSync(sourceDir)) {
           const s = path2.join(sourceDir, itemName);
           yield io.cp(s, destPath, { recursive: true });
         }
-        _completeToolPath(tool, version, arch2);
+        _completeToolPath(tool, version, arch);
         return destPath;
       });
     }
     exports2.cacheDir = cacheDir;
-    function cacheFile(sourceFile, targetFile, tool, version, arch2) {
+    function cacheFile(sourceFile, targetFile, tool, version, arch) {
       return __awaiter(this, void 0, void 0, function* () {
         version = semver.clean(version) || version;
-        arch2 = arch2 || os3.arch();
-        core3.debug(`Caching tool ${tool} ${version} ${arch2}`);
+        arch = arch || os3.arch();
+        core3.debug(`Caching tool ${tool} ${version} ${arch}`);
         core3.debug(`source file: ${sourceFile}`);
         if (!fs2.statSync(sourceFile).isFile()) {
           throw new Error('sourceFile is not a file');
         }
-        const destFolder = yield _createToolPath(tool, version, arch2);
+        const destFolder = yield _createToolPath(tool, version, arch);
         const destPath = path2.join(destFolder, targetFile);
         core3.debug(`destination file ${destPath}`);
         yield io.cp(sourceFile, destPath);
-        _completeToolPath(tool, version, arch2);
+        _completeToolPath(tool, version, arch);
         return destFolder;
       });
     }
     exports2.cacheFile = cacheFile;
-    function find(toolName, versionSpec, arch2) {
+    function find(toolName, versionSpec, arch) {
       if (!toolName) {
         throw new Error('toolName parameter is required');
       }
       if (!versionSpec) {
         throw new Error('versionSpec parameter is required');
       }
-      arch2 = arch2 || os3.arch();
+      arch = arch || os3.arch();
       if (!isExplicitVersion(versionSpec)) {
-        const localVersions = findAllVersions(toolName, arch2);
+        const localVersions = findAllVersions(toolName, arch);
         const match = evaluateVersions(localVersions, versionSpec);
         versionSpec = match;
       }
       let toolPath = '';
       if (versionSpec) {
         versionSpec = semver.clean(versionSpec) || '';
-        const cachePath = path2.join(_getCacheDirectory(), toolName, versionSpec, arch2);
+        const cachePath = path2.join(_getCacheDirectory(), toolName, versionSpec, arch);
         core3.debug(`checking cache: ${cachePath}`);
         if (fs2.existsSync(cachePath) && fs2.existsSync(`${cachePath}.complete`)) {
-          core3.debug(`Found tool in cache ${toolName} ${versionSpec} ${arch2}`);
+          core3.debug(`Found tool in cache ${toolName} ${versionSpec} ${arch}`);
           toolPath = cachePath;
         } else {
           core3.debug('not found');
@@ -4357,15 +4357,15 @@ var require_tool_cache = __commonJS({
       return toolPath;
     }
     exports2.find = find;
-    function findAllVersions(toolName, arch2) {
+    function findAllVersions(toolName, arch) {
       const versions = [];
-      arch2 = arch2 || os3.arch();
+      arch = arch || os3.arch();
       const toolPath = path2.join(_getCacheDirectory(), toolName);
       if (fs2.existsSync(toolPath)) {
         const children = fs2.readdirSync(toolPath);
         for (const child of children) {
           if (isExplicitVersion(child)) {
-            const fullPath = path2.join(toolPath, child, arch2 || '');
+            const fullPath = path2.join(toolPath, child, arch || '');
             if (fs2.existsSync(fullPath) && fs2.existsSync(`${fullPath}.complete`)) {
               versions.push(child);
             }
@@ -4426,13 +4426,13 @@ var require_tool_cache = __commonJS({
         return dest;
       });
     }
-    function _createToolPath(tool, version, arch2) {
+    function _createToolPath(tool, version, arch) {
       return __awaiter(this, void 0, void 0, function* () {
         const folderPath = path2.join(
           _getCacheDirectory(),
           tool,
           semver.clean(version) || version,
-          arch2 || ''
+          arch || ''
         );
         core3.debug(`destination ${folderPath}`);
         const markerPath = `${folderPath}.complete`;
@@ -4442,12 +4442,12 @@ var require_tool_cache = __commonJS({
         return folderPath;
       });
     }
-    function _completeToolPath(tool, version, arch2) {
+    function _completeToolPath(tool, version, arch) {
       const folderPath = path2.join(
         _getCacheDirectory(),
         tool,
         semver.clean(version) || version,
-        arch2 || ''
+        arch || ''
       );
       const markerPath = `${folderPath}.complete`;
       fs2.writeFileSync(markerPath, '');
@@ -4520,7 +4520,7 @@ async function getFlyway(versionSpec, osArch = os.arch()) {
   } else {
     core.info(`Attempting to download ${versionSpec}...`);
     let downloadPath = '';
-    let info = (await getInfoFromDist(versionSpec, arch)) || {};
+    let info = (await getInfoFromDist(versionSpec, osArch)) || {};
     if (!info) {
       throw new Error(
         `Unable to find Flyway version '${versionSpec}' for platform ${osPlat} and architecture ${osArch}.`
@@ -4548,22 +4548,26 @@ async function getFlyway(versionSpec, osArch = os.arch()) {
     toolPath = await tc.cacheDir(extPath, 'flyway', info.resolvedVersion, info.arch);
     core.info('Done');
   }
+  if (osPlat === 'win32') {
+    toolPath = path.join(toolPath, `flyway-${versionSpec}`);
+  }
   const driversPath = path.join(toolPath, 'drivers');
   core.addPath(toolPath);
   core.addPath(driversPath);
 }
 async function getInfoFromDist(version, osArch = os.arch()) {
   let osPlat = os.platform();
-  let fileName =
-    osPlat == 'win32'
-      ? `flyway-commandline-${version}-windows-${osArch}`
-      : `flyway-commandline-${version}-${osPlat}-${osArch}`;
+  core.info(`Current Operating System Platform: ${osPlat}`);
+  let fileName = osPlat === 'win32' ? `flyway-commandline-${version}-windows-${osArch}` : '';
+  fileName =
+    fileName || (osPlat === 'linux' ? `flyway-commandline-${version}-linux-${osArch}` : '');
+  fileName = fileName || `flyway-commandline-${version}-macosx-${osArch}`;
   let urlFileName = osPlat == 'win32' ? `${fileName}.zip` : `${fileName}.tar.gz`;
   let url = `https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${version}/${urlFileName}`;
   return {
     downloadUrl: url,
     resolvedVersion: version,
-    arch,
+    arch: osArch,
     fileName
   };
 }
