@@ -8,6 +8,7 @@ inputs:
     required: true
   architecture:
     description: 'Target operating system architecture for Flyway to use. Examples: x86, x64. Will use system architecture by default.'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'
