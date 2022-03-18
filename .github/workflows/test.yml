@@ -1,5 +1,9 @@
 name: Test
 on:
+  # This workflow uses the pull_request trigger which prevents write permissions and secrets
+  # access to the target repository from public forks.  This should remain as a pull_request
+  # trigger because checkout, build, format and checking for changes do not need elevated
+  # permissions to the repository.  The reduced permissions for public forks is adequate.
   pull_request:
     paths-ignore:
       - '**.md'
@@ -27,7 +31,7 @@ jobs:
           if(-Not ($FlywayVersion -Match "5.1.4")) {
             exit code 1
           }
-          
+
   test-flyway-version-700:
     runs-on: ${{ matrix.operating-system }}
     strategy:
