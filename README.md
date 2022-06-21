@@ -30,7 +30,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Flyway
-        uses: im-open/setup-flyway@v1.0.2
+        uses: im-open/setup-flyway@v1.0.4
         with:
           version: 5.1.4
 
