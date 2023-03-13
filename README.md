@@ -1,18 +1,19 @@
 # setup-flyway
 
 This action downloads and installs [Flyway](https://flywaydb.org/) via the [Actions tool-cache utility](https://github.com/actions/toolkit/tree/main/packages/tool-cache).
-    
-## Index 
+
+## Index
   
 - [Inputs](#inputs)
 - [Example](#example)
 - [Contributing](#contributing)
-  - [Recompiling](#recompiling)
+  - [Recompiling](#recompiling-manually)
   - [Incrementing the Version](#incrementing-the-version)
 - [Code of Conduct](#code-of-conduct)
 - [License](#license)  
 
 ## Inputs
+
 | Parameter      | Is Required | Description                                                                                                          |
 | -------------- | ----------- | -------------------------------------------------------------------------------------------------------------------- |
 | `version`      | true        | The version of Flyway to install                                                                                     |
@@ -30,7 +31,8 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Flyway
-        uses: im-open/setup-flyway@v1.1.1
+        # You may also reference the major or major.minor version
+        uses: im-open/setup-flyway@v1.1.2
         with:
           version: 5.1.4
 
