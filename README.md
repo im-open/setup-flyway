@@ -35,7 +35,7 @@ jobs:
 
       - name: Setup Flyway
         # You may also reference the major or major.minor version
-        uses: im-open/setup-flyway@v1.1.3
+        uses: im-open/setup-flyway@v1.2.0
         with:
           version: 5.1.4
 
