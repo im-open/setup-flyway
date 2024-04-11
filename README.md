@@ -3,7 +3,7 @@
 This action downloads and installs [Flyway](https://flywaydb.org/) via the [Actions tool-cache utility](https://github.com/actions/toolkit/tree/main/packages/tool-cache).
 
 ## Index <!-- omit in toc -->
-  
+
 - [setup-flyway](#setup-flyway)
   - [Inputs](#inputs)
   - [Usage Examples](#usage-examples)
@@ -31,11 +31,11 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Flyway
         # You may also reference the major or major.minor version
-        uses: im-open/setup-flyway@v1.2.0
+        uses: im-open/setup-flyway@v1.3.0
         with:
           version: 5.1.4
 
@@ -66,7 +66,7 @@ This repo uses [git-version-lite] in its workflows to examine commit messages to
 
 ### Source Code Changes
 
-The files and directories that are considered source code are listed in the `files-with-code` and `dirs-with-code` arguments in both the [build-and-review-pr] and [increment-version-on-merge] workflows.  
+The files and directories that are considered source code are listed in the `files-with-code` and `dirs-with-code` arguments in both the [build-and-review-pr] and [increment-version-on-merge] workflows.
 
 If a PR contains source code changes, the README.md should be updated with the latest action version and the action should be recompiled.  The [build-and-review-pr] workflow will ensure these steps are performed when they are required.  The workflow will provide instructions for completing these steps if the PR Author does not initially complete them.
 
