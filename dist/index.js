@@ -1856,10 +1856,10 @@ var require_oidc_utils = __commonJS({
         return __awaiter(this, void 0, void 0, function* () {
           const httpclient = OidcClient.createHttpClient();
           const res = yield httpclient.getJson(id_token_url).catch(error => {
-            throw new Error(`Failed to get ID Token. 
- 
+            throw new Error(`Failed to get ID Token.
+
         Error Code : ${error.statusCode}
- 
+
         Error Message: ${error.result.message}`);
           });
           const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
@@ -6487,7 +6487,7 @@ async function getInfoFromDist(version, osArch = os.arch()) {
   let fileName = osPlat === 'win32' ? `flyway-commandline-${version}-windows-${osArch}` : '';
   fileName =
     fileName || (osPlat === 'linux' ? `flyway-commandline-${version}-linux-${osArch}` : '');
-  fileName = fileName || `flyway-commandline-${version}-macosx-${osArch}`;
+  fileName = fileName || `flyway-commandline-${version}-macosx-x64`;
   let urlFileName = osPlat == 'win32' ? `${fileName}.zip` : `${fileName}.tar.gz`;
   let url = `https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${version}/${urlFileName}`;
   return {
