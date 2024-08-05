@@ -6487,7 +6487,7 @@ async function getInfoFromDist(version, osArch = os.arch()) {
   let fileName = osPlat === 'win32' ? `flyway-commandline-${version}-windows-${osArch}` : '';
   fileName =
     fileName || (osPlat === 'linux' ? `flyway-commandline-${version}-linux-${osArch}` : '');
-  fileName = fileName || `flyway-commandline-${version}-macosx-${osArch}`;
+  fileName = fileName || `flyway-commandline-${version}-macosx-x64`;
   let urlFileName = osPlat == 'win32' ? `${fileName}.zip` : `${fileName}.tar.gz`;
   let url = `https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${version}/${urlFileName}`;
   return {
