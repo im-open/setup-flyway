@@ -17,10 +17,11 @@ This action downloads and installs [Flyway](https://flywaydb.org/) via the [Acti
 
 ## Inputs
 
-| Parameter      | Is Required | Description                                                                                                          |
-|----------------|-------------|----------------------------------------------------------------------------------------------------------------------|
-| `version`      | true        | The version of Flyway to install                                                                                     |
-| `architecture` | false       | Target operating system architecture for Flyway to use. Examples: x86, x64. Will use system architecture by default. |
+| Parameter         | Is Required | Description                                                                                                          |
+|----------------   |-------------|----------------------------------------------------------------------------------------------------------------------|
+| `version`         | true        | The version of Flyway to install                                                                                     |
+| `architecture`    | false       | Target operating system architecture for Flyway to use. Examples: x86, x64. Will use system architecture by default. |
+| `use-redgate-url` | false       | Use the flyway tarball from the Redgate URL. If false, will pull from maven url. Default is false.                   |
 
 ## Usage Examples
 
@@ -35,9 +36,31 @@ jobs:
 
       - name: Setup Flyway
         # You may also reference the major or major.minor version
-        uses: im-open/setup-flyway@v1.3.0
+        uses: im-open/setup-flyway@v1.3.1
         with:
-          version: 5.1.4
+          version: 10.18.1
+
+      - name: Migrate Database
+        run: flyway migrate
+```
+
+***Using Redgate URL**
+
+```yml
+jobs:
+  migrate-database:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flyway
+        # You may also reference the major or major.minor version
+        uses: im-open/setup-flyway@v1.3.1
+        with:
+          version: 10.18.1
+          use-redgate-url: true
 
       - name: Migrate Database
         run: flyway migrate

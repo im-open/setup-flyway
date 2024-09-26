@@ -9,6 +9,10 @@ on:
     # check that our Branch Protection Rules can use.  Having a status check also allows us
     # to require that branches be up to date before they are merged.
 
+concurrency:
+  group: test-flyway-${{ github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   test-flyway-version-514:
     runs-on: ${{ matrix.operating-system }}
@@ -25,6 +29,7 @@ jobs:
         uses: ./
         with:
           version: 5.1.4
+
       - name: Check Version
         id: flyway-version
         shell: pwsh
@@ -49,11 +54,38 @@ jobs:
         uses: ./
         with:
           version: 7.0.0
+
       - name: Check Version
         id: flyway-version
         shell: pwsh
         run: |
           $FlywayVersion = flyway -v
           if(-Not ($FlywayVersion -Match "7.0.0")) {
+            exit code 1
+          }
+
+  test-flyway-version-10181-redgate:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ubuntu-latest, windows-latest, macOS-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flyway
+        uses: ./
+        with:
+          version: 10.18.1
+          use-redgate-url: true
+
+      - name: Check Version
+        id: flyway-version
+        shell: pwsh
+        run: |
+          $FlywayVersion = flyway -v
+          if(-Not ($FlywayVersion -Match "10.18.1")) {
             exit code 1
           }

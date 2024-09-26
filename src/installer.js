@@ -4,7 +4,7 @@ const tc = require('@actions/tool-cache');
 const path = require('path');
 const fs = require('fs');
 
-export async function getFlyway(versionSpec, osArch = os.arch()) {
+export async function getFlyway(versionSpec, osArch = os.arch(), useRedgateUrl = false) {
   let osPlat = os.platform();
 
   // check cache
@@ -17,7 +17,7 @@ export async function getFlyway(versionSpec, osArch = os.arch()) {
   } else {
     core.info(`Attempting to download ${versionSpec}...`);
     let downloadPath = '';
-    let info = (await getInfoFromDist(versionSpec, osArch)) || {};
+    let info = (await getInfoFromDist(versionSpec, osArch, useRedgateUrl)) || {};
 
     //
     // Download from Flyway
@@ -76,7 +76,7 @@ export async function getFlyway(versionSpec, osArch = os.arch()) {
   core.addPath(driversPath);
 }
 
-async function getInfoFromDist(version, osArch = os.arch()) {
+async function getInfoFromDist(version, osArch = os.arch(), useRedgateUrl = false) {
   let osPlat = os.platform();
   core.info(`Current Operating System Platform: ${osPlat}`);
   let fileName = osPlat === 'win32' ? `flyway-commandline-${version}-windows-${osArch}` : '';
@@ -84,8 +84,9 @@ async function getInfoFromDist(version, osArch = os.arch()) {
     fileName || (osPlat === 'linux' ? `flyway-commandline-${version}-linux-${osArch}` : '');
   fileName = fileName || `flyway-commandline-${version}-macosx-x64`; // If not windows or linux, then mac and there is only one arch for mac
   let urlFileName = osPlat == 'win32' ? `${fileName}.zip` : `${fileName}.tar.gz`;
-  let url = `https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${version}/${urlFileName}`;
-
+  let mavenUrl = `https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${version}/${urlFileName}`;
+  let redgateUrl = `https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/${version}/${urlFileName}`;
+  let url = useRedgateUrl ? redgateUrl : mavenUrl;
   return {
     downloadUrl: url,
     resolvedVersion: version,
