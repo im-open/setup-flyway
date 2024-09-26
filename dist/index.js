@@ -6437,7 +6437,7 @@ var installer_exports = {};
 __export(installer_exports, {
   getFlyway: () => getFlyway
 });
-async function getFlyway(versionSpec, osArch = os.arch()) {
+async function getFlyway(versionSpec, osArch = os.arch(), useRedgateUrl = false) {
   let osPlat = os.platform();
   let toolPath;
   toolPath = tc.find('flyway', versionSpec, osArch);
@@ -6446,7 +6446,7 @@ async function getFlyway(versionSpec, osArch = os.arch()) {
   } else {
     core.info(`Attempting to download ${versionSpec}...`);
     let downloadPath = '';
-    let info = (await getInfoFromDist(versionSpec, osArch)) || {};
+    let info = (await getInfoFromDist(versionSpec, osArch, useRedgateUrl)) || {};
     if (!info) {
       throw new Error(
         `Unable to find Flyway version '${versionSpec}' for platform ${osPlat} and architecture ${osArch}.`
@@ -6481,7 +6481,7 @@ async function getFlyway(versionSpec, osArch = os.arch()) {
   core.addPath(toolPath);
   core.addPath(driversPath);
 }
-async function getInfoFromDist(version, osArch = os.arch()) {
+async function getInfoFromDist(version, osArch = os.arch(), useRedgateUrl = false) {
   let osPlat = os.platform();
   core.info(`Current Operating System Platform: ${osPlat}`);
   let fileName = osPlat === 'win32' ? `flyway-commandline-${version}-windows-${osArch}` : '';
@@ -6489,7 +6489,9 @@ async function getInfoFromDist(version, osArch = os.arch()) {
     fileName || (osPlat === 'linux' ? `flyway-commandline-${version}-linux-${osArch}` : '');
   fileName = fileName || `flyway-commandline-${version}-macosx-x64`;
   let urlFileName = osPlat == 'win32' ? `${fileName}.zip` : `${fileName}.tar.gz`;
-  let url = `https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${version}/${urlFileName}`;
+  let mavenUrl = `https://repo1.maven.org/maven2/org/flywaydb/flyway-commandline/${version}/${urlFileName}`;
+  let redgateUrl = `https://download.red-gate.com/maven/release/com/redgate/flyway/flyway-commandline/${version}/${urlFileName}`;
+  let url = useRedgateUrl ? redgateUrl : mavenUrl;
   return {
     downloadUrl: url,
     resolvedVersion: version,
@@ -6516,10 +6518,11 @@ async function run() {
   try {
     const version = core2.getInput('version', { required: true });
     let osArchitecture = core2.getInput('architecture');
+    const useRedgateUrl = core2.getInput('use-redgate-url') == 'true';
     if (!osArchitecture) {
       osArchitecture = os2.arch();
     }
-    await installer.getFlyway(version, osArchitecture);
+    await installer.getFlyway(version, osArchitecture, useRedgateUrl);
   } catch (error) {
     core2.setFailed(error.message);
   }

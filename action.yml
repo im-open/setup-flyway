@@ -9,6 +9,10 @@ inputs:
   architecture:
     description: 'Target operating system architecture for Flyway to use. Examples: x86, x64. Will use system architecture by default.'
     required: false
+  use-redgate-url:
+    description: 'Use the flyway tarball from the Redgate URL. If false, will pull from maven url. Default is false.'
+    required: false
+    default: false
 runs:
   using: 'node20'
   main: 'dist/index.js'
